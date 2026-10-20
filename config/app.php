@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'demo_counselor_password' => env('DEMO_COUNSELOR_PASSWORD', 'pathfinder-demo'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
