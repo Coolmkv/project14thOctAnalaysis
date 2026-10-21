@@ -22,4 +22,9 @@ class Assessment extends Model
     {
         return $this->hasMany(AssessmentQuestion::class)->orderBy('position');
     }
+
+    public function submissions(): HasMany
+    {
+        return $this->hasMany(AssessmentSubmission::class);
+    }
 }

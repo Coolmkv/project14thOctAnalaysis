@@ -20,7 +20,7 @@ class AssessmentCreationTest extends TestCase
 
     public function test_authenticated_user_can_create_assessment_with_questions(): void
     {
-        $author = User::factory()->create();
+        $author = User::factory()->create(['role' => User::ROLE_COUNSELOR]);
 
         $response = $this->actingAs($author)->post(route('assessments.store'), [
             'title' => 'Career interests check-in',
@@ -44,7 +44,7 @@ class AssessmentCreationTest extends TestCase
 
     public function test_assessment_requires_at_least_one_question_with_two_choices(): void
     {
-        $author = User::factory()->create();
+        $author = User::factory()->create(['role' => User::ROLE_COUNSELOR]);
 
         $this->actingAs($author)
             ->from(route('assessments.create'))

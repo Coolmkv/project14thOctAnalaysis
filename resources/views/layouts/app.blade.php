@@ -13,12 +13,17 @@
 <body class="min-h-screen bg-[#f7f8fc] text-slate-800 antialiased">
     <header class="border-b border-slate-200/80 bg-white">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-            <a href="{{ auth()->check() ? route('assessments.index') : route('login') }}" class="flex items-center gap-3 font-bold text-slate-900">
+            <a href="{{ route('home') }}" class="flex items-center gap-3 font-bold text-slate-900">
                 <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-lg text-white">P</span>
                 <span class="font-display text-lg">pathfinder<span class="text-indigo-600">.</span></span>
             </a>
             @auth
                 <div class="flex items-center gap-4 text-sm">
+                    @if (auth()->user()->hasRole(\App\Models\User::ROLE_USER))
+                        <a href="{{ route('student.assessments.index') }}" class="hidden font-semibold text-slate-600 hover:text-indigo-600 sm:inline">Explore assessments</a>
+                    @else
+                        <a href="{{ route('assessments.index') }}" class="hidden font-semibold text-slate-600 hover:text-indigo-600 sm:inline">Counselor workspace</a>
+                    @endif
                     <span class="hidden text-slate-500 sm:inline">{{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

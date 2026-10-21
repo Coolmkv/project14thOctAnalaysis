@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function showLogin(): View
+    public function showLogin(string $audience = 'student'): View
     {
-        return view('auth.login');
+        return view('auth.login', ['audience' => $audience]);
     }
 
     public function login(Request $request): RedirectResponse
@@ -22,14 +23,32 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        $audience = $request->routeIs('counselor.login.store') ? 'counselor' : 'student';
+        $authenticated = Auth::attempt($credentials, $request->boolean('remember'));
+
+        if (! $authenticated) {
             return back()->withErrors(['email' => 'These credentials do not match our records.'])
+                ->onlyInput('email');
+        }
+
+        $roleAllowed = $audience === 'counselor'
+            ? $request->user()->hasRole(User::ROLE_COUNSELOR, User::ROLE_ADMIN)
+            : $request->user()->hasRole(User::ROLE_USER);
+
+        if (! $roleAllowed) {
+            Auth::logout();
+
+            return back()->withErrors(['email' => 'This account cannot sign in through this portal.'])
                 ->onlyInput('email');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('assessments.index'));
+        $destination = $audience === 'counselor'
+            ? route('assessments.index')
+            : route('student.assessments.index');
+
+        return redirect()->intended($destination);
     }
 
     public function showRegister(): View
@@ -49,7 +68,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('assessments.index');
+        return redirect()->route('student.assessments.index');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -58,6 +77,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

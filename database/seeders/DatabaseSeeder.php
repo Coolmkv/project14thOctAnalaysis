@@ -29,6 +29,16 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make(config('app.demo_counselor_password')),
             ],
         );
+        $counselor->forceFill(['role' => User::ROLE_COUNSELOR])->save();
+
+        User::firstOrCreate(
+            ['email' => 'student@example.com'],
+            [
+                'name' => 'Alex Morgan',
+                'password' => Hash::make(config('app.demo_student_password')),
+                'role' => User::ROLE_USER,
+            ],
+        );
 
         $samples = [
             [

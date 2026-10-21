@@ -17,6 +17,8 @@ return [
 
     'demo_counselor_password' => env('DEMO_COUNSELOR_PASSWORD', 'pathfinder-demo'),
 
+    'demo_student_password' => env('DEMO_STUDENT_PASSWORD', 'student-demo'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
