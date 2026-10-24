@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-3xl">
-    <p class="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-indigo-600">Your Pathfinder space</p>
+    <p class="mb-3 text-sm font-bold uppercase tracking-[0.16em] text-indigo-600">Your {{ config('app.name', 'Mindscape Navigation') }} space</p>
     <h1 class="font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Explore your interests</h1>
     <p class="mt-3 text-slate-500">Choose an assessment to reflect on your strengths, interests, and the kinds of activities you enjoy.</p>
 </div>

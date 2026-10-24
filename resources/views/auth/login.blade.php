@@ -24,7 +24,7 @@
             <button class="w-full rounded-xl bg-indigo-600 px-5 py-3.5 font-bold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700">Sign in</button>
         </form>
         @if ($audience === 'student')
-            <p class="mt-6 text-center text-sm text-slate-500">New to Pathfinder? <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-700">Create a student account</a></p>
+            <p class="mt-6 text-center text-sm text-slate-500">New to {{ config('app.name', 'Mindscape Navigation') }}? <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-700">Create a student account</a></p>
             <p class="mt-4 text-center text-sm text-slate-500">Are you a counselor? <a href="{{ route('counselor.login') }}" class="font-bold text-indigo-600 hover:text-indigo-700">Counselor sign in</a></p>
         @else
             <p class="mt-6 text-center text-sm text-slate-500">Student? <a href="{{ route('login') }}" class="font-bold text-indigo-600 hover:text-indigo-700">Go to student sign in</a></p>

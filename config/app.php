@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Mindscape Navigation'),
 
     'demo_counselor_password' => env('DEMO_COUNSELOR_PASSWORD', 'pathfinder-demo'),
 
