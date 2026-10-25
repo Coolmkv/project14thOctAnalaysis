@@ -20,20 +20,84 @@ class AdminDashboardController extends Controller
 {
     public function adminDashboard(): View
     {
+        $start = now()->subDays(6)->startOfDay();
+        $submissionCounts = DB::table('assessment_submissions')
+            ->selectRaw('DATE(submitted_at) as submission_date, COUNT(*) as total')
+            ->where('submitted_at', '>=', $start)
+            ->groupBy('submission_date')
+            ->pluck('total', 'submission_date');
+
+        $submissionTrend = collect(range(6, 0))->map(function (int $daysAgo) use ($submissionCounts): array {
+            $date = now()->subDays($daysAgo);
+
+            return [
+                'label' => $date->format('D'),
+                'count' => (int) $submissionCounts->get($date->toDateString(), 0),
+            ];
+        });
+
+        $institutes = Institute::query()
+            ->withCount(['users' => fn ($query) => $query->where('role', User::ROLE_USER)])
+            ->orderByDesc('users_count')
+            ->limit(6)
+            ->get();
+
         return view('admin.dashboard', [
-            'institutes' => Institute::query()->withCount('users')->orderBy('name')->get(),
+            'instituteCount' => Institute::count(),
             'staffCount' => User::query()->whereIn('role', [
                 User::ROLE_ADMIN,
                 User::ROLE_COUNSELOR,
                 User::ROLE_GROUP_ADMIN,
             ])->count(),
             'studentCount' => User::query()->where('role', User::ROLE_USER)->count(),
+            'submissionCount' => DB::table('assessment_submissions')->count(),
+            'submissionTrend' => $submissionTrend,
+            'instituteChart' => $institutes,
             'assessments' => Assessment::query()
                 ->with('author')
                 ->withCount('submissions')
                 ->latest()
-                ->limit(25)
+                ->limit(6)
                 ->get(),
+        ]);
+    }
+
+    public function createAccountPage(): View
+    {
+        return view('admin.accounts.create', [
+            'institutes' => Institute::query()->orderBy('name')->get(),
+        ]);
+    }
+
+    public function institutesPage(): View
+    {
+        return view('admin.institutes.index', [
+            'institutes' => Institute::query()->withCount('users')->orderBy('name')->get(),
+        ]);
+    }
+
+    public function importStudentsPage(): View
+    {
+        return view('admin.students.import', [
+            'institutes' => Institute::query()->orderBy('name')->get(),
+        ]);
+    }
+
+    public function staffPage(): View
+    {
+        return view('admin.staff.index', [
+            'staffCount' => User::query()->whereIn('role', [
+                User::ROLE_ADMIN,
+                User::ROLE_COUNSELOR,
+                User::ROLE_GROUP_ADMIN,
+            ])->count(),
+        ]);
+    }
+
+    public function studentsPage(): View
+    {
+        return view('admin.students.index', [
+            'studentCount' => User::query()->where('role', User::ROLE_USER)->count(),
         ]);
     }
 
@@ -106,7 +170,7 @@ class AdminDashboardController extends Controller
             $user->institutes()->sync($validated['institute_ids']);
         }
 
-        return redirect()->route('admin.dashboard')->with('status', 'Account created successfully.');
+        return redirect()->route('admin.accounts.create')->with('status', 'Account created successfully.');
     }
 
     public function createInstitute(Request $request): RedirectResponse
@@ -117,7 +181,7 @@ class AdminDashboardController extends Controller
 
         Institute::create(['name' => $validated['institute_name']]);
 
-        return redirect()->route('admin.dashboard')->with('status', 'Institute created successfully.');
+        return redirect()->route('admin.institutes.index')->with('status', 'Institute created successfully.');
     }
 
     public function deleteInstitute(Institute $institute): RedirectResponse
@@ -125,7 +189,7 @@ class AdminDashboardController extends Controller
         $name = $institute->name;
         $institute->delete();
 
-        return redirect()->route('admin.dashboard')
+        return redirect()->route('admin.institutes.index')
             ->with('status', $name.' was deleted. Student accounts and assessment results were kept.');
     }
 
@@ -141,7 +205,7 @@ class AdminDashboardController extends Controller
         $this->validateStudentRows($rows);
         $temporaryPassword = $this->createStudentAccounts($rows, $institute);
 
-        return redirect()->route('admin.dashboard')
+        return redirect()->route('admin.students.import')
             ->with('status', count($rows).' student accounts imported into '.$institute->name.'.')
             ->with('temporary_password', $temporaryPassword);
     }
@@ -294,8 +358,8 @@ class AdminDashboardController extends Controller
 
         $recordsFiltered = (clone $query)->count();
         $columns = $staff
-            ? ['name', 'email', 'role', 'id']
-            : ['name', 'email', 'id', 'assessment_submissions_count'];
+            ? ['name', 'email', 'role', 'institutes']
+            : ['name', 'email', 'institutes', 'assessment_submissions_count'];
         $orderIndex = filter_var($request->input('order.0.column', 0), FILTER_VALIDATE_INT);
         $orderIndex = $orderIndex !== false && isset($columns[$orderIndex]) ? $orderIndex : 0;
         $direction = $request->input('order.0.dir') === 'desc' ? 'desc' : 'asc';
@@ -304,7 +368,9 @@ class AdminDashboardController extends Controller
         $start = filter_var($request->input('start', 0), FILTER_VALIDATE_INT);
         $start = $start !== false ? max($start, 0) : 0;
 
-        $query->orderBy($columns[$orderIndex], $direction);
+        if ($columns[$orderIndex] !== 'institutes') {
+            $query->orderBy($columns[$orderIndex], $direction);
+        }
         if ($staff) {
             $query->with('institutes');
         } else {

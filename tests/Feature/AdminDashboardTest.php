@@ -47,10 +47,10 @@ class AdminDashboardTest extends TestCase
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
         $this->actingAs($admin);
 
-        $this->post(route('admin.institutes.store'), ['name' => 'North School'])
-            ->assertRedirect(route('admin.dashboard'));
-        $this->post(route('admin.institutes.store'), ['name' => 'South Institute'])
-            ->assertRedirect(route('admin.dashboard'));
+        $this->post(route('admin.institutes.store'), ['institute_name' => 'North School'])
+            ->assertRedirect(route('admin.institutes.index'));
+        $this->post(route('admin.institutes.store'), ['institute_name' => 'South Institute'])
+            ->assertRedirect(route('admin.institutes.index'));
 
         $institutes = Institute::query()->pluck('id')->all();
         $this->post(route('admin.users.store'), [
@@ -60,7 +60,7 @@ class AdminDashboardTest extends TestCase
             'password' => 'a-strong-password',
             'password_confirmation' => 'a-strong-password',
             'institute_ids' => $institutes,
-        ])->assertRedirect(route('admin.dashboard'));
+        ])->assertRedirect(route('admin.accounts.create'));
 
         $groupAdmin = User::where('email', 'manager@example.test')->firstOrFail();
         $this->assertSame(User::ROLE_GROUP_ADMIN, $groupAdmin->role);
@@ -80,7 +80,7 @@ class AdminDashboardTest extends TestCase
                     "name,email\nRiley Student,riley@example.test\n",
                 ),
             ])
-            ->assertRedirect(route('admin.dashboard'))
+            ->assertRedirect(route('admin.students.import-form'))
             ->assertSessionHas('temporary_password');
 
         $student = User::where('email', 'riley@example.test')->firstOrFail();
@@ -171,6 +171,34 @@ class AdminDashboardTest extends TestCase
             ->assertJsonPath('data.0.name', $student->name);
     }
 
+    public function test_admin_management_tools_are_available_on_separate_pages(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.accounts.create'))
+            ->assertOk()
+            ->assertSeeText('Create staff account');
+
+        $this->get(route('admin.institutes.index'))
+            ->assertOk()
+            ->assertSeeText('All institutes');
+
+        $this->get(route('admin.students.import-form'))
+            ->assertOk()
+            ->assertSeeText('Upload student CSV');
+
+        $this->get(route('admin.staff.index'))
+            ->assertOk()
+            ->assertSee('data-datatable', false)
+            ->assertSee('data-source', false);
+
+        $this->get(route('admin.students.index'))
+            ->assertOk()
+            ->assertSee('data-datatable', false)
+            ->assertSee('data-source', false);
+    }
+
     public function test_deleting_an_institute_keeps_student_accounts_and_assessment_submissions(): void
     {
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
@@ -187,7 +215,7 @@ class AdminDashboardTest extends TestCase
 
         $this->actingAs($admin)
             ->delete(route('admin.institutes.destroy', $institute))
-            ->assertRedirect(route('admin.dashboard'))
+            ->assertRedirect(route('admin.institutes.index'))
             ->assertSessionHas('status');
 
         $this->assertDatabaseMissing('institutes', ['id' => $institute->id]);

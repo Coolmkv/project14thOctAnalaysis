@@ -20,7 +20,11 @@
     @else
         <div class="mt-8 space-y-6">
             @foreach ($studentSummaries as $summary)
-                @php($profile = $summary['scores']; $chartPoints = \App\Support\RiaSecScorer::chartPoints($profile); $top = $summary['top'];)
+                @php
+                    $profile = $summary['scores'];
+                    $chartPoints = \App\Support\RiaSecScorer::chartPoints($profile);
+                    $top = $summary['top'];
+                @endphp
                 <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div>
@@ -37,32 +41,42 @@
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                             <svg viewBox="0 0 300 300" class="mx-auto block h-64 w-full max-w-[280px]">
                                 @foreach (\App\Support\RiaSecScorer::ORDER as $index => $code)
-                                    @php($angle = -M_PI / 2 + ($index / count(\App\Support\RiaSecScorer::ORDER)) * (2 * M_PI); $axisX = 150 + cos($angle) * 110; $axisY = 150 + sin($angle) * 110; $labelX = 150 + cos($angle) * 128; $labelY = 150 + sin($angle) * 128;)
+                                    @php
+                                        $angle = -M_PI / 2 + ($index / count(\App\Support\RiaSecScorer::ORDER)) * (2 * M_PI);
+                                        $axisX = 150 + cos($angle) * 110;
+                                        $axisY = 150 + sin($angle) * 110;
+                                        $labelX = 150 + cos($angle) * 128;
+                                        $labelY = 150 + sin($angle) * 128;
+                                    @endphp
                                     <line x1="150" y1="150" x2="{{ $axisX }}" y2="{{ $axisY }}" stroke="#dbe4ff" stroke-width="1" />
                                     <text x="{{ $labelX }}" y="{{ $labelY }}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-family="sans-serif" fill="#4f46e5" font-weight="700">{{ $code }}</text>
                                 @endforeach
 
                                 @foreach ([25, 50, 75, 100] as $ring)
-                                    @php($points = [];
+                                    @php
+                                        $points = [];
                                         foreach (\App\Support\RiaSecScorer::ORDER as $index => $code) {
                                             $angle = -M_PI / 2 + ($index / count(\App\Support\RiaSecScorer::ORDER)) * (2 * M_PI);
                                             $x = 150 + cos($angle) * ($ring * 0.8);
                                             $y = 150 + sin($angle) * ($ring * 0.8);
                                             $points[] = $x.','.$y;
                                         }
-                                    )
+                                    @endphp
                                     <polygon points="{{ implode(' ', $points) }}" fill="none" stroke="#e2e8f0" stroke-width="1" />
                                 @endforeach
 
-                                @php($polygon = [];
+                                @php
+                                    $polygon = [];
                                     foreach (\App\Support\RiaSecScorer::ORDER as $code) {
                                         [$x, $y] = $chartPoints[$code];
                                         $polygon[] = $x.','.$y;
                                     }
-                                )
+                                @endphp
                                 <polygon points="{{ implode(' ', $polygon) }}" fill="rgba(79,70,229,0.2)" stroke="#4f46e5" stroke-width="2" />
                                 @foreach (\App\Support\RiaSecScorer::ORDER as $code)
-                                    @php([$x, $y] = $chartPoints[$code];)
+                                    @php
+                                        [$x, $y] = $chartPoints[$code];
+                                    @endphp
                                     <circle cx="{{ $x }}" cy="{{ $y }}" r="5" fill="#312e81" />
                                 @endforeach
                             </svg>
@@ -70,7 +84,9 @@
 
                         <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                             @foreach (\App\Support\RiaSecScorer::ORDER as $code)
-                                @php($details = \App\Support\RiaSecScorer::DOMAIN_DETAILS[$code];)
+                                @php
+                                    $details = \App\Support\RiaSecScorer::DOMAIN_DETAILS[$code];
+                                @endphp
                                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                                     <div class="flex items-center justify-between gap-3">
                                         <span class="text-sm font-bold text-indigo-700">{{ $code }}</span>
