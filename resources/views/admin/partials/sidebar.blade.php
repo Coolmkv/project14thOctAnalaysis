@@ -1,42 +1,74 @@
-<aside id="admin-sidebar" class="admin-sidebar shrink-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:sticky lg:top-6 lg:w-64">
-    <div class="mb-5 flex items-center justify-between px-2">
-        <span class="admin-sidebar-label text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Workspace</span>
-        <button id="admin-sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true" class="hidden rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 lg:inline-flex">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><path d="m9 6 4 6-4 6" class="sidebar-chevron"/></svg>
-        </button>
+<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="265px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+    <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+        <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-3">
+            <span class="admin-brand-mark">R</span>
+            <span class="d-flex flex-column">
+                <span class="text-white fs-5 fw-bold">RIASEC</span>
+                <span class="text-gray-500 fs-8">Admin workspace</span>
+            </span>
+        </a>
+        <div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-sm h-30px w-30px position-absolute top-50 start-100 translate-middle rotate" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
+            <i class="ki-outline ki-arrow-left fs-2 rotate-180"></i>
+        </div>
     </div>
-    <nav aria-label="Admin navigation" class="grid grid-cols-2 gap-1 lg:flex lg:flex-col">
-        <a href="{{ route('admin.dashboard') }}" title="Overview" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.dashboard')])>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>
-            <span class="admin-sidebar-label">Overview</span>
-        </a>
-        <details class="admin-sidebar-group col-span-2" open>
-            <summary title="Management">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 11h6"/></svg>
-                <span class="admin-sidebar-label">Management</span>
-                <svg class="admin-sidebar-label admin-group-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
-            </summary>
-            <div class="admin-sidebar-subnav">
-                <a href="{{ route('admin.accounts.create') }}" title="Create account" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.accounts.*')])>
-                    <span class="admin-subnav-dot"></span><span class="admin-sidebar-label">Create account</span>
-                </a>
-                <a href="{{ route('admin.institutes.index') }}" title="Institutes" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.institutes.*')])>
-                    <span class="admin-subnav-dot"></span><span class="admin-sidebar-label">Institutes</span>
-                </a>
-                <a href="{{ route('admin.students.import-form') }}" title="Import students" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.students.import*')])>
-                    <span class="admin-subnav-dot"></span><span class="admin-sidebar-label">Import students</span>
-                </a>
-                <a href="{{ route('admin.staff.index') }}" title="Staff" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.staff.*')])>
-                    <span class="admin-subnav-dot"></span><span class="admin-sidebar-label">Staff</span>
-                </a>
-                <a href="{{ route('admin.students.index') }}" title="Students" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.students.index')])>
-                    <span class="admin-subnav-dot"></span><span class="admin-sidebar-label">Students</span>
-                </a>
+    <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+        <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper">
+            <div id="kt_app_sidebar_menu" class="menu menu-column menu-rounded menu-sub-indention px-3" data-kt-menu="true" data-kt-menu-expand="false">
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                        <span class="menu-icon"><i class="ki-outline ki-element-11 fs-2"></i></span>
+                        <span class="menu-title">Overview</span>
+                    </a>
+                </div>
+                <div class="menu-item pt-5">
+                    <div class="menu-content"><span class="menu-heading fw-bold text-uppercase fs-7">Management</span></div>
+                </div>
+                <div class="menu-item {{ request()->routeIs('admin.accounts.*', 'admin.users.*') ? 'here show' : '' }}">
+                    <a class="menu-link {{ request()->routeIs('admin.accounts.*', 'admin.users.*') ? 'active' : '' }}" href="{{ route('admin.accounts.create') }}">
+                        <span class="menu-icon"><i class="ki-outline ki-profile-user fs-2"></i></span>
+                        <span class="menu-title">Accounts</span>
+                    </a>
+                </div>
+                <div class="menu-item {{ request()->routeIs('admin.institutes.*') ? 'here show' : '' }}">
+                    <a class="menu-link {{ request()->routeIs('admin.institutes.*') ? 'active' : '' }}" href="{{ route('admin.institutes.index') }}">
+                        <span class="menu-icon"><i class="ki-outline ki-office-bag fs-2"></i></span>
+                        <span class="menu-title">Institutes</span>
+                    </a>
+                </div>
+                <div class="menu-item {{ request()->routeIs('admin.students.import*') ? 'here show' : '' }}">
+                    <a class="menu-link {{ request()->routeIs('admin.students.import*') ? 'active' : '' }}" href="{{ route('admin.students.import-form') }}">
+                        <span class="menu-icon"><i class="ki-outline ki-file-up fs-2"></i></span>
+                        <span class="menu-title">Import students</span>
+                    </a>
+                </div>
+                <div class="menu-item {{ request()->routeIs('admin.staff.*') ? 'here show' : '' }}">
+                    <a class="menu-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}">
+                        <span class="menu-icon"><i class="ki-outline ki-people fs-2"></i></span>
+                        <span class="menu-title">Staff</span>
+                    </a>
+                </div>
+                <div class="menu-item {{ request()->routeIs('admin.students.index') ? 'here show' : '' }}">
+                    <a class="menu-link {{ request()->routeIs('admin.students.index') ? 'active' : '' }}" href="{{ route('admin.students.index') }}">
+                        <span class="menu-icon"><i class="ki-outline ki-user-square fs-2"></i></span>
+                        <span class="menu-title">Students</span>
+                    </a>
+                </div>
+                <div class="menu-item pt-5">
+                    <div class="menu-content"><span class="menu-heading fw-bold text-uppercase fs-7">Platform</span></div>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ route('admin.dashboard') }}#assessment-activity">
+                        <span class="menu-icon"><i class="ki-outline ki-chart-simple-3 fs-2"></i></span>
+                        <span class="menu-title">Assessments</span>
+                    </a>
+                </div>
             </div>
-        </details>
-        <a href="{{ route('admin.dashboard') }}#assessment-activity" title="Assessments" class="admin-nav-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3.75h8l4 4V20a.75.75 0 0 1-.75.75h-10.5A.75.75 0 0 1 6 20z"/><path d="M14 3.75V8h4M9 12h6M9 16h6"/></svg>
-            <span class="admin-sidebar-label">Assessments</span>
-        </a>
-    </nav>
-</aside>
+        </div>
+    </div>
+    <div class="app-sidebar-footer flex-column-auto pt-5 pb-7 px-6">
+        <div class="rounded p-4 bg-light-primary">
+            <div class="text-primary fw-bold fs-7">Career exploration</div>
+            <div class="text-gray-600 fs-8 mt-1">Manage your RIASEC platform</div>
+        </div>
+    </div>
+</div>

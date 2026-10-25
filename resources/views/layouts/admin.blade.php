@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Admin') · {{ config('app.name', 'Mindscape Navigation') }}</title>
+    <link rel="stylesheet" href="{{ asset('css/metronic-theme.css') }}">
+    @vite(['resources/css/app.css', 'resources/css/metronic-admin.css'])
+</head>
+<body id="kt_app_body"
+      data-kt-app-layout="dark-sidebar"
+      data-kt-app-header-fixed="true"
+      data-kt-app-sidebar-enabled="true"
+      data-kt-app-sidebar-fixed="true"
+      data-kt-app-sidebar-hoverable="true"
+      data-kt-app-sidebar-push-header="true"
+      data-kt-app-sidebar-push-toolbar="true"
+      data-kt-app-sidebar-push-footer="true"
+      data-kt-app-toolbar-enabled="true"
+      class="app-default">
+    <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
+        <div class="app-page flex-column flex-column-fluid" id="kt_app_page">
+            <header id="kt_app_header" class="app-header" data-kt-sticky="true" data-kt-sticky-activate="{default: true, lg: true}" data-kt-sticky-name="app-header-minimize" data-kt-sticky-offset="{default: '200px', lg: '0'}">
+                <div class="app-container container-fluid d-flex align-items-stretch justify-content-between" id="kt_app_header_container">
+                    <div class="d-flex align-items-center d-lg-none ms-n3 me-1">
+                        <button type="button" class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_sidebar_mobile_toggle" aria-label="Open admin navigation">
+                            <i class="ki-outline ki-abstract-14 fs-2"></i>
+                        </button>
+                    </div>
+                    <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center flex-grow-1 flex-lg-grow-0 d-lg-none">
+                        <span class="admin-brand-mark">M</span>
+                    </a>
+                    <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1">
+                        <div class="d-none d-lg-flex align-items-center">
+                            <a href="{{ route('home') }}" class="text-gray-600 fs-7 fw-semibold text-decoration-none">Career exploration platform</a>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            @include('layouts.partials.theme-mode-switcher')
+                            <div class="d-none d-sm-flex flex-column text-end">
+                                <span class="text-gray-800 fs-7 fw-bold">{{ auth()->user()->name }}</span>
+                                <span class="text-gray-500 fs-8">Administrator</span>
+                            </div>
+                            <div class="symbol symbol-40px symbol-circle">
+                                <span class="symbol-label bg-light-primary text-primary fs-5 fw-bold">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
+                            </div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="btn btn-sm btn-light-danger">Sign out</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
+                @include('admin.partials.sidebar')
+                <main class="app-main flex-column flex-row-fluid" id="kt_app_main">
+                    <div class="d-flex flex-column flex-column-fluid">
+                        <div class="app-toolbar py-3 py-lg-6" id="kt_app_toolbar">
+                            <div class="app-container container-fluid d-flex flex-stack">
+                                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">@yield('page-title', 'Admin workspace')</h1>
+                                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                                        <li class="breadcrumb-item text-muted"><a href="{{ route('admin.dashboard') }}" class="text-muted text-hover-primary">Home</a></li>
+                                        @hasSection('breadcrumb')
+                                            <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+                                            <li class="breadcrumb-item text-muted">@yield('breadcrumb')</li>
+                                        @endif
+                                    </ul>
+                                </div>
+                                @yield('toolbar')
+                            </div>
+                        </div>
+                        <div class="app-content flex-column-fluid" id="kt_app_content">
+                            <div class="app-container container-fluid" id="kt_app_content_container">
+                                @if (session('status'))
+                                    <div class="alert alert-success d-flex align-items-center p-5 mb-6" role="status">
+                                        <i class="ki-outline ki-check-circle fs-2hx text-success me-4"></i>
+                                        <div class="d-flex flex-column">{{ session('status') }}</div>
+                                    </div>
+                                @endif
+                                @yield('content')
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="app-footer">
+                        <div class="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
+                            <span class="text-gray-600 fs-7">RIASEC career exploration · {{ now()->year }}</span>
+                            <a href="{{ route('home') }}" class="text-gray-600 text-hover-primary fs-7">View website</a>
+                        </div>
+                    </footer>
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="{{ asset('metronic/assets/plugins/global/plugins.bundle.js') }}"></script>
+    <script src="{{ asset('metronic/assets/js/scripts.bundle.js') }}"></script>
+    @vite('resources/js/app.js')
+</body>
+</html>

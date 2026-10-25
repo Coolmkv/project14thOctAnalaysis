@@ -1,23 +1,6 @@
 import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const sidebar = document.querySelector('#admin-sidebar');
-    const sidebarToggle = document.querySelector('#admin-sidebar-toggle');
-
-    if (sidebar && sidebarToggle) {
-        const collapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
-        sidebar.classList.toggle('is-collapsed', collapsed);
-        sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
-        sidebarToggle.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
-
-        sidebarToggle.addEventListener('click', () => {
-            const isCollapsed = sidebar.classList.toggle('is-collapsed');
-            localStorage.setItem('admin-sidebar-collapsed', String(isCollapsed));
-            sidebarToggle.setAttribute('aria-expanded', String(!isCollapsed));
-            sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
-        });
-    }
-
     const tables = document.querySelectorAll('[data-datatable]');
     if (tables.length > 0) {
         const { default: DataTable } = await import('datatables.net-dt');

@@ -1,0 +1,4 @@
+@layer theme, base, components, metronic, utilities;
+
+@import url('../metronic/assets/plugins/global/plugins.bundle.css') layer(metronic);
+@import url('../metronic/assets/css/style.bundle.css') layer(metronic);

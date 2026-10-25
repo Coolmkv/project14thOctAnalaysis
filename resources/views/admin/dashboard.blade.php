@@ -1,6 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Admin overview')
+@section('page-title', 'Dashboard')
+@section('breadcrumb', 'Overview')
 
 @section('content')
 @include('admin.partials.shell-start')
