@@ -1,9 +1,8 @@
 <div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="265px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
     <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
-        <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-3">
-            <span class="admin-brand-mark">R</span>
+        <a href="{{ route('admin.dashboard') }}" class="portal-sidebar-brand d-flex flex-column" aria-label="Admin dashboard">
+            <img src="{{ asset('images/mindscape-logo.jpg') }}" alt="{{ config('app.name', 'Mindscape Navigation') }}" class="mindscape-logo-sidebar">
             <span class="d-flex flex-column">
-                <span class="text-white fs-5 fw-bold">RIASEC</span>
                 <span class="text-gray-500 fs-8">Admin workspace</span>
             </span>
         </a>

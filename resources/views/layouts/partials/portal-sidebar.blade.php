@@ -8,10 +8,9 @@
      data-kt-drawer-direction="start"
      data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
     <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
-        <a href="{{ route('home') }}" class="d-flex align-items-center gap-3 text-decoration-none">
-            <span class="admin-brand-mark">M</span>
+        <a href="{{ route('home') }}" class="portal-sidebar-brand d-flex flex-column text-decoration-none" aria-label="{{ config('app.name', 'Mindscape Navigation') }} home">
+            <img src="{{ asset('images/mindscape-logo.jpg') }}" alt="{{ config('app.name', 'Mindscape Navigation') }}" class="mindscape-logo-sidebar">
             <span class="d-flex flex-column">
-                <span class="text-white fs-5 fw-bold">Mindscape</span>
                 <span class="text-gray-500 fs-8">
                     @if ($user->hasRole(\App\Models\User::ROLE_USER)) Student space
                     @elseif ($user->hasRole(\App\Models\User::ROLE_COUNSELOR)) Counselor workspace

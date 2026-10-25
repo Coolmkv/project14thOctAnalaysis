@@ -47,10 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     labels: chartData.labels || [],
                     datasets: [{
                         data: chartData.values || [],
-                        borderColor: '#4f46e5',
+                        borderColor: '#347f29',
                         backgroundColor: isInstituteChart
-                            ? ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#f43f5e']
-                            : 'rgba(79, 70, 229, 0.12)',
+                            ? ['#347f29', '#0755a5', '#ef7625', '#5a9d48', '#4389c9', '#f29b5e']
+                            : 'rgba(52, 127, 41, 0.12)',
                         borderWidth: 2,
                         fill: !isInstituteChart,
                         tension: 0.38,

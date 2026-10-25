@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') · {{ config('app.name', 'Mindscape Navigation') }}</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/mindscape-logo.jpg') }}">
     <link rel="stylesheet" href="{{ asset('css/metronic-theme.css') }}">
     @vite(['resources/css/app.css', 'resources/css/metronic-admin.css'])
 </head>
@@ -28,8 +29,8 @@
                             <i class="ki-outline ki-abstract-14 fs-2"></i>
                         </button>
                     </div>
-                    <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center flex-grow-1 flex-lg-grow-0 d-lg-none">
-                        <span class="admin-brand-mark">M</span>
+                    <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center flex-grow-1 flex-lg-grow-0 d-lg-none" aria-label="Admin dashboard">
+                        <img src="{{ asset('images/mindscape-logo.jpg') }}" alt="{{ config('app.name', 'Mindscape Navigation') }}" class="mindscape-logo-mobile">
                     </a>
                     <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1">
                         <div class="d-none d-lg-flex align-items-center">

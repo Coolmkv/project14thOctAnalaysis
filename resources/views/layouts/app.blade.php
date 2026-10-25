@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Mindscape Navigation')) · {{ config('app.name', 'Mindscape Navigation') }}</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/mindscape-logo.jpg') }}">
     <link rel="stylesheet" href="{{ asset('css/metronic-theme.css') }}">
     @vite(['resources/css/app.css', 'resources/css/metronic-admin.css'])
 </head>
@@ -28,9 +29,8 @@
                             <button type="button" class="btn btn-icon btn-active-color-primary w-35px h-35px d-lg-none" id="kt_app_sidebar_mobile_toggle" aria-label="Open navigation">
                                 <i class="ki-outline ki-abstract-14 fs-2"></i>
                             </button>
-                            <a href="{{ route('home') }}" class="d-flex align-items-center gap-3 text-gray-900 text-decoration-none">
-                                <span class="admin-brand-mark">M</span>
-                                <span class="d-none d-sm-inline fw-bold">{{ config('app.name', 'Mindscape Navigation') }}</span>
+                            <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none" aria-label="{{ config('app.name', 'Mindscape Navigation') }} home">
+                                <img src="{{ asset('images/mindscape-logo.jpg') }}" alt="{{ config('app.name', 'Mindscape Navigation') }}" class="mindscape-logo-header">
                             </a>
                         </div>
                         <div class="d-flex align-items-center gap-3">
@@ -100,9 +100,8 @@
         <div class="d-flex flex-column flex-root">
             <header class="bg-white border-bottom">
                 <div class="container d-flex align-items-center justify-content-between py-4">
-                    <a href="{{ route('home') }}" class="d-flex align-items-center gap-3 text-gray-900 text-decoration-none fw-bold">
-                        <span class="admin-brand-mark">M</span>
-                        <span>{{ config('app.name', 'Mindscape Navigation') }}</span>
+                    <a href="{{ route('home') }}" class="d-flex align-items-center text-gray-900 text-decoration-none fw-bold" aria-label="{{ config('app.name', 'Mindscape Navigation') }} home">
+                        <img src="{{ asset('images/mindscape-logo.jpg') }}" alt="{{ config('app.name', 'Mindscape Navigation') }}" class="mindscape-logo-guest">
                     </a>
                     <nav class="d-flex align-items-center gap-3" aria-label="Main navigation">
                         @if (request()->routeIs('home'))

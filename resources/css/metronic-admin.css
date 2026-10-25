@@ -1,7 +1,15 @@
 :root {
-    --bs-primary: #4f46e5;
-    --bs-primary-rgb: 79, 70, 229;
+    --bs-primary: #347f29;
+    --bs-primary-rgb: 52, 127, 41;
     --bs-body-font-family: Inter, 'Segoe UI', system-ui, sans-serif;
+}
+
+:root,
+[data-bs-theme='light'] {
+    --bs-primary: #347f29;
+    --bs-primary-rgb: 52, 127, 41;
+    --bs-link-color: #0755a5;
+    --bs-link-hover-color: #064481;
 }
 
 body,
@@ -33,10 +41,48 @@ textarea {
     align-items: center;
     justify-content: center;
     border-radius: .75rem;
-    background: #4f46e5;
+    background: #347f29;
     color: #fff;
     font-size: 1.2rem;
     font-weight: 800;
+}
+
+.mindscape-logo-header {
+    display: block;
+    width: auto;
+    height: 38px;
+    object-fit: contain;
+}
+
+.mindscape-logo-mobile {
+    display: block;
+    width: auto;
+    max-width: 150px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.mindscape-logo-guest {
+    display: block;
+    width: auto;
+    max-width: min(240px, 48vw);
+    height: 54px;
+    object-fit: contain;
+}
+
+.mindscape-logo-sidebar {
+    display: block;
+    width: 190px;
+    max-width: 100%;
+    height: 52px;
+    border-radius: .35rem;
+    background: #fff;
+    object-fit: contain;
+}
+
+.portal-sidebar-brand {
+    align-items: flex-start;
+    gap: .5rem;
 }
 
 .admin-page-content {
@@ -84,8 +130,8 @@ textarea {
 }
 
 .admin-form-control:focus {
-    border-color: #9b8afb;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+    border-color: #7fb76e;
+    box-shadow: 0 0 0 3px rgba(52, 127, 41, .14);
 }
 
 .admin-data-table {
@@ -219,8 +265,8 @@ html[data-bs-theme='dark'] .dt-container {
 
 .dt-container .dt-search input:focus,
 .dt-container .dt-length select:focus {
-    border-color: #9b8afb !important;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+    border-color: #7fb76e !important;
+    box-shadow: 0 0 0 3px rgba(52, 127, 41, .14);
 }
 
 .dt-container .dt-paging .dt-paging-button {
@@ -233,8 +279,8 @@ html[data-bs-theme='dark'] .dt-container {
 .dt-container .dt-paging .dt-paging-button:hover,
 .dt-container .dt-paging .dt-paging-button.current {
     border: 0 !important;
-    background: #f1efff !important;
-    color: #4f46e5 !important;
+    background: #e4f0df !important;
+    color: #28691f !important;
 }
 
 .dt-container .dt-processing {

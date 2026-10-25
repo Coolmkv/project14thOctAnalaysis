@@ -4,16 +4,16 @@
 
 @section('content')
 <div class="space-y-20 pb-8 sm:space-y-24">
-    <section class="relative isolate overflow-hidden rounded-[2rem] bg-[#171943] text-white shadow-xl shadow-indigo-950/10">
-        <div class="absolute -right-24 -top-32 -z-10 h-96 w-96 rounded-full bg-indigo-500/30 blur-3xl" aria-hidden="true"></div>
-        <div class="absolute -bottom-48 left-1/3 -z-10 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl" aria-hidden="true"></div>
+    <section class="relative isolate overflow-hidden rounded-[2rem] bg-[#173d1b] text-white shadow-xl shadow-green-950/20">
+        <div class="absolute -right-24 -top-32 -z-10 h-96 w-96 rounded-full bg-green-500/30 blur-3xl" aria-hidden="true"></div>
+        <div class="absolute -bottom-48 left-1/3 -z-10 h-96 w-96 rounded-full bg-orange-400/15 blur-3xl" aria-hidden="true"></div>
         <div class="grid items-center gap-10 px-6 py-10 sm:px-10 sm:py-14 lg:grid-cols-[1fr_0.9fr] lg:gap-8 lg:px-16 lg:py-16">
             <div class="max-w-xl">
                 <p class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.16em] text-indigo-100">
-                    <span class="h-2 w-2 rounded-full bg-teal-300" aria-hidden="true"></span>
+                    <span class="h-2 w-2 rounded-full bg-orange-400" aria-hidden="true"></span>
                     A space to explore what’s next
                 </p>
-                <h1 class="mt-6 font-display text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.5rem]">Your future is yours to explore.</h1>
+                <h1 class="mt-6 font-display text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.5rem] text-white">Your future is yours to explore.</h1>
                 <p class="mt-5 max-w-lg text-base leading-7 text-indigo-100 sm:text-lg sm:leading-8">Get curious about what you enjoy, see patterns in your interests, and choose a next step that feels right for you.</p>
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                     <a href="{{ route('register') }}" class="rounded-xl bg-white px-6 py-3.5 text-center font-bold text-indigo-800 shadow-lg shadow-black/10 transition hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Start exploring</a>
@@ -28,8 +28,8 @@
                 <svg viewBox="0 0 520 420" class="h-auto w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <defs>
                         <linearGradient id="path-glow" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0" stop-color="#A5B4FC"/>
-                            <stop offset="1" stop-color="#5EEAD4"/>
+                            <stop offset="0" stop-color="#F07625"/>
+                            <stop offset="1" stop-color="#4C963D"/>
                         </linearGradient>
                         <filter id="card-shadow" x="-30%" y="-30%" width="160%" height="170%">
                             <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#080A2E" flood-opacity=".22"/>
@@ -38,30 +38,30 @@
                     <circle cx="263" cy="204" r="166" fill="#fff" fill-opacity=".035"/>
                     <circle cx="263" cy="204" r="126" fill="none" stroke="#fff" stroke-opacity=".1" stroke-dasharray="3 9"/>
                     <path d="M111 203c45-70 82 76 126 8 36-56 65 63 111 1 27-37 48-36 72-14" fill="none" stroke="url(#path-glow)" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 0"/>
-                    <circle cx="111" cy="203" r="7" fill="#A5B4FC"/>
-                    <circle cx="237" cy="211" r="7" fill="#C4B5FD"/>
-                    <circle cx="348" cy="212" r="7" fill="#5EEAD4"/>
-                    <circle cx="420" cy="198" r="7" fill="#5EEAD4"/>
+                    <circle cx="111" cy="203" r="7" fill="#F07625"/>
+                    <circle cx="237" cy="211" r="7" fill="#F9A15D"/>
+                    <circle cx="348" cy="212" r="7" fill="#4C963D"/>
+                    <circle cx="420" cy="198" r="7" fill="#0D55A5"/>
 
                     <g filter="url(#card-shadow)">
                         <rect x="183" y="136" width="160" height="132" rx="24" fill="#fff"/>
-                        <circle cx="263" cy="177" r="22" fill="#EEF2FF"/>
-                        <path d="M254 179l7 7 13-17" fill="none" stroke="#4F46E5" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <text x="263" y="222" text-anchor="middle" fill="#171943" font-family="sans-serif" font-size="15" font-weight="700">Your interests</text>
+                        <circle cx="263" cy="177" r="22" fill="#E4F0DF"/>
+                        <path d="M254 179l7 7 13-17" fill="none" stroke="#347F29" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <text x="263" y="222" text-anchor="middle" fill="#173D1B" font-family="sans-serif" font-size="15" font-weight="700">Your interests</text>
                         <text x="263" y="244" text-anchor="middle" fill="#64748B" font-family="sans-serif" font-size="12">A starting point, not a label</text>
                     </g>
 
                     <g filter="url(#card-shadow)">
                         <rect x="23" y="161" width="117" height="82" rx="18" fill="#fff"/>
-                        <circle cx="49" cy="190" r="14" fill="#E0E7FF"/>
-                        <text x="49" y="195" text-anchor="middle" fill="#4338CA" font-family="sans-serif" font-size="13" font-weight="800">R</text>
+                        <circle cx="49" cy="190" r="14" fill="#E4F0DF"/>
+                        <text x="49" y="195" text-anchor="middle" fill="#28691F" font-family="sans-serif" font-size="13" font-weight="800">R</text>
                         <text x="70" y="194" fill="#1E293B" font-family="sans-serif" font-size="12" font-weight="700">Explore</text>
                         <text x="42" y="222" fill="#64748B" font-family="sans-serif" font-size="11">What you enjoy</text>
                     </g>
                     <g filter="url(#card-shadow)">
                         <rect x="358" y="52" width="139" height="82" rx="18" fill="#fff"/>
-                        <circle cx="385" cy="81" r="14" fill="#CCFBF1"/>
-                        <text x="385" y="86" text-anchor="middle" fill="#0F766E" font-family="sans-serif" font-size="13" font-weight="800">6</text>
+                        <circle cx="385" cy="81" r="14" fill="#E4F0DF"/>
+                        <text x="385" y="86" text-anchor="middle" fill="#28691F" font-family="sans-serif" font-size="13" font-weight="800">6</text>
                         <text x="377" y="112" fill="#64748B" font-family="sans-serif" font-size="11">RIASEC interest themes</text>
                     </g>
                     <g filter="url(#card-shadow)">
@@ -72,10 +72,10 @@
                         <text x="370" y="343" fill="#64748B" font-family="sans-serif" font-size="11">Reflect or talk it through</text>
                     </g>
                     <circle cx="127" cy="89" r="4" fill="#C4B5FD" fill-opacity=".8"/>
-                    <circle cx="445" cy="237" r="5" fill="#5EEAD4" fill-opacity=".8"/>
+                    <circle cx="445" cy="237" r="5" fill="#F07625" fill-opacity=".9"/>
                     <circle cx="163" cy="324" r="4" fill="#fff" fill-opacity=".55"/>
                     <path d="M113 290l4 8 8 4-8 4-4 8-4-8-8-4 8-4 4-8z" fill="#FCD34D" fill-opacity=".9"/>
-                    <path d="M284 63l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6z" fill="#C4B5FD" fill-opacity=".8"/>
+                    <path d="M284 63l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6z" fill="#0D55A5" fill-opacity=".9"/>
                 </svg>
             </div>
         </div>
