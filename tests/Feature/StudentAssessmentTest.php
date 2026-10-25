@@ -55,6 +55,60 @@ class StudentAssessmentTest extends TestCase
         $this->assertSame(1, $assessment->submissions()->count());
     }
 
+    public function test_riasec_assessment_displays_interest_profile_after_submission(): void
+    {
+        $student = User::factory()->create();
+        $counselor = User::factory()->create(['role' => User::ROLE_COUNSELOR]);
+        $assessment = $counselor->assessments()->create([
+            'title' => 'RIASEC Career Interest Inventory',
+            'description' => 'A structured RIASEC assessment to help students identify their strongest patterns.',
+            'status' => 'published',
+        ]);
+
+        $questions = [
+            $assessment->questions()->create([
+                'prompt' => 'Which task sounds most engaging?',
+                'choices' => [
+                    'Realistic: Building, fixing, or working with tools',
+                    'Investigative: Researching, testing, or solving complex problems',
+                    'Artistic: Designing, creating, or expressing ideas',
+                    'Social: Helping, teaching, or supporting other people',
+                    'Enterprising: Leading projects, influencing others, or taking initiative',
+                    'Conventional: Organizing, planning, or keeping systems running smoothly',
+                ],
+                'position' => 1,
+            ]),
+            $assessment->questions()->create([
+                'prompt' => 'What kind of work environment do you prefer?',
+                'choices' => [
+                    'Realistic: Hands-on work with materials or equipment',
+                    'Investigative: Structured problem-solving and experimentation',
+                    'Artistic: Flexible, creative spaces with room for originality',
+                    'Social: Collaborative environments where people are supported',
+                    'Enterprising: Fast-moving settings with goals and decision-making',
+                    'Conventional: Clear routines and organized systems',
+                ],
+                'position' => 2,
+            ]),
+        ];
+
+        $answers = [
+            $questions[0]->id => 'Realistic: Building, fixing, or working with tools',
+            $questions[1]->id => 'Social: Collaborative environments where people are supported',
+        ];
+
+        $this->actingAs($student)
+            ->post(route('student.assessments.submit', $assessment), ['answers' => $answers])
+            ->assertRedirect(route('student.assessments.show', $assessment));
+
+        $this->actingAs($student)
+            ->get(route('student.assessments.show', $assessment))
+            ->assertOk()
+            ->assertSee('RIASEC profile')
+            ->assertSee('Realistic')
+            ->assertSee('Social');
+    }
+
     public function test_student_cannot_submit_an_answer_not_offered_by_the_assessment(): void
     {
         $student = User::factory()->create();

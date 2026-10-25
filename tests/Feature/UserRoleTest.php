@@ -17,7 +17,7 @@ class UserRoleTest extends TestCase
 
         $this->assertSame(User::ROLE_USER, $user->fresh()->role);
         $this->assertSame(
-            [User::ROLE_ADMIN, User::ROLE_USER, User::ROLE_COUNSELOR],
+            [User::ROLE_ADMIN, User::ROLE_USER, User::ROLE_COUNSELOR, User::ROLE_GROUP_ADMIN],
             User::ROLES,
         );
     }

@@ -14,6 +14,10 @@
             <h2 class="mt-5 font-display text-xl font-bold text-slate-900">{{ $assessment->title }}</h2>
             <p class="mt-2 min-h-12 text-sm leading-6 text-slate-500">{{ $assessment->description ?: 'No description added.' }}</p>
             <div class="mt-5 border-t border-slate-100 pt-4 text-sm font-semibold text-slate-500">{{ $assessment->questions_count }} {{ \Illuminate\Support\Str::plural('question', $assessment->questions_count) }}</div>
+            <div class="mt-5 flex items-center justify-between gap-3">
+                <span class="text-sm text-slate-500">{{ $assessment->submissions_count }} completed</span>
+                <a href="{{ route('assessments.results', $assessment) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">View results</a>
+            </div>
         </article>
     @empty
         <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">

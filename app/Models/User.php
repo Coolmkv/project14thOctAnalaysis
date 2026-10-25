@@ -5,9 +5,10 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -20,8 +21,10 @@ class User extends Authenticatable
 
     public const ROLE_COUNSELOR = 'counselor';
 
+    public const ROLE_GROUP_ADMIN = 'group_admin';
+
     /** @var list<string> */
-    public const ROLES = [self::ROLE_ADMIN, self::ROLE_USER, self::ROLE_COUNSELOR];
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_USER, self::ROLE_COUNSELOR, self::ROLE_GROUP_ADMIN];
 
     /**
      * The model's default attributes.
@@ -41,6 +44,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'must_change_password',
     ];
 
     /**
@@ -68,6 +73,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -79,5 +85,10 @@ class User extends Authenticatable
     public function assessmentSubmissions(): HasMany
     {
         return $this->hasMany(AssessmentSubmission::class);
+    }
+
+    public function institutes(): BelongsToMany
+    {
+        return $this->belongsToMany(Institute::class)->withTimestamps();
     }
 }

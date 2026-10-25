@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
-use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -23,7 +23,12 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $audience = $request->routeIs('counselor.login.store') ? 'counselor' : 'student';
+        $audience = match (true) {
+            $request->routeIs('admin.login.store') => 'admin',
+            $request->routeIs('group-admin.login.store') => 'group_admin',
+            $request->routeIs('counselor.login.store') => 'counselor',
+            default => 'student',
+        };
         $authenticated = Auth::attempt($credentials, $request->boolean('remember'));
 
         if (! $authenticated) {
@@ -31,9 +36,12 @@ class AuthController extends Controller
                 ->onlyInput('email');
         }
 
-        $roleAllowed = $audience === 'counselor'
-            ? $request->user()->hasRole(User::ROLE_COUNSELOR, User::ROLE_ADMIN)
-            : $request->user()->hasRole(User::ROLE_USER);
+        $roleAllowed = match ($audience) {
+            'admin' => $request->user()->hasRole(User::ROLE_ADMIN),
+            'group_admin' => $request->user()->hasRole(User::ROLE_GROUP_ADMIN),
+            'counselor' => $request->user()->hasRole(User::ROLE_COUNSELOR),
+            default => $request->user()->hasRole(User::ROLE_USER),
+        };
 
         if (! $roleAllowed) {
             Auth::logout();
@@ -44,11 +52,45 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $destination = $audience === 'counselor'
-            ? route('assessments.index')
-            : route('student.assessments.index');
+        if ($request->user()->must_change_password) {
+            return redirect()->route('account.password.edit');
+        }
+
+        $destination = match ($audience) {
+            'admin' => route('admin.dashboard'),
+            'group_admin' => route('group-admin.dashboard'),
+            'counselor' => route('assessments.index'),
+            default => route('student.assessments.index'),
+        };
 
         return redirect()->intended($destination);
+    }
+
+    public function showChangePassword(): View
+    {
+        return view('auth.change-password');
+    }
+
+    public function changePassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'confirmed', Password::min(8)],
+        ]);
+
+        $request->user()->forceFill([
+            'password' => $validated['password'],
+            'must_change_password' => false,
+        ])->save();
+
+        $destination = match ($request->user()->role) {
+            User::ROLE_ADMIN => route('admin.dashboard'),
+            User::ROLE_GROUP_ADMIN => route('group-admin.dashboard'),
+            User::ROLE_COUNSELOR => route('assessments.index'),
+            default => route('student.assessments.index'),
+        };
+
+        return redirect()->to($destination)
+            ->with('status', 'Your password has been updated.');
     }
 
     public function showRegister(): View
@@ -64,7 +106,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        $user = \App\Models\User::create($validated);
+        $user = User::create($validated);
         Auth::login($user);
         $request->session()->regenerate();
 

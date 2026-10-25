@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assessment;
+use App\Models\User;
+use App\Support\RiaSecScorer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,9 +34,15 @@ class AssessmentController extends Controller
             ->where('user_id', $request->user()->id)
             ->first();
 
+        $riaSecProfile = [];
+        if ($submission && RiaSecScorer::isRiaSecAssessment($assessment->title, $assessment->description)) {
+            $riaSecProfile = RiaSecScorer::calculateForAssessment($assessment->load('questions'), $submission);
+        }
+
         return view('student.assessments.show', [
             'assessment' => $assessment->load('questions'),
             'submission' => $submission,
+            'riaSecProfile' => $riaSecProfile,
         ]);
     }
 
@@ -83,10 +91,37 @@ class AssessmentController extends Controller
     {
         $assessments = $request->user()->assessments()
             ->withCount('questions')
+            ->withCount('submissions')
             ->latest()
             ->get();
 
         return view('assessments.index', compact('assessments'));
+    }
+
+    public function results(Request $request, Assessment $assessment): View
+    {
+        abort_unless($assessment->user_id === $request->user()->id || $request->user()->hasRole(User::ROLE_ADMIN), 403);
+
+        $assessment->load(['questions', 'submissions.student']);
+
+        $studentSummaries = $assessment->submissions
+            ->map(function ($submission) use ($assessment) {
+                $scores = RiaSecScorer::calculateForAssessment($assessment, $submission);
+                $top = RiaSecScorer::topDomains($scores);
+
+                return [
+                    'student' => $submission->student,
+                    'submitted_at' => $submission->submitted_at,
+                    'scores' => $scores,
+                    'top' => $top,
+                ];
+            })
+            ->values();
+
+        return view('assessments.results', [
+            'assessment' => $assessment,
+            'studentSummaries' => $studentSummaries,
+        ]);
     }
 
     public function create(): View

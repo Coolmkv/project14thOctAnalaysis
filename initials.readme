@@ -1,1 +1,15 @@
-This project is started on 14th oct to analyse psycometric testing for anyone 
+This project is started on 14th oct to analyse psycometric testing for anyone
+
+Admin and institute setup
+-------------------------
+Run `php artisan migrate` to create the institute and role-support tables.
+Create the first administrator interactively with `php artisan app:create-admin`.
+The admin signs in at `/admin/login`, creates institutes and staff accounts,
+and assigns group admins to one or more institutes. Group admins sign in at
+`/group-admin/login`.
+
+Admins and group admins can import students from a CSV containing exactly
+these headers: `name,email`. Each import can contain up to 500 students.
+The generated temporary password is displayed once after import; share it
+securely with that student batch. Imported students must set a personal
+password the first time they sign in.

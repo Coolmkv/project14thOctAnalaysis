@@ -14,6 +14,12 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $response->assertOk()
+            ->assertSee('Your future is yours to explore.')
+            ->assertSee('How career exploration works')
+            ->assertSee('RIASEC')
+            ->assertSee('Realistic')
+            ->assertSee('Conventional')
+            ->assertSee('not a diagnosis');
     }
 }

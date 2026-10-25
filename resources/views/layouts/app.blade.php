@@ -21,6 +21,10 @@
                 <div class="flex items-center gap-4 text-sm">
                     @if (auth()->user()->hasRole(\App\Models\User::ROLE_USER))
                         <a href="{{ route('student.assessments.index') }}" class="hidden font-semibold text-slate-600 hover:text-indigo-600 sm:inline">Explore assessments</a>
+                    @elseif (auth()->user()->hasRole(\App\Models\User::ROLE_ADMIN))
+                        <a href="{{ route('admin.dashboard') }}" class="hidden font-semibold text-slate-600 hover:text-indigo-600 sm:inline">Admin dashboard</a>
+                    @elseif (auth()->user()->hasRole(\App\Models\User::ROLE_GROUP_ADMIN))
+                        <a href="{{ route('group-admin.dashboard') }}" class="hidden font-semibold text-slate-600 hover:text-indigo-600 sm:inline">Institute dashboard</a>
                     @else
                         <a href="{{ route('assessments.index') }}" class="hidden font-semibold text-slate-600 hover:text-indigo-600 sm:inline">Counselor workspace</a>
                     @endif
