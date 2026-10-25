@@ -19,6 +19,10 @@ return [
 
     'demo_student_password' => env('DEMO_STUDENT_PASSWORD', 'student-demo'),
 
+    'demo_admin_password' => env('DEMO_ADMIN_PASSWORD', 'admin-demo'),
+
+    'demo_group_admin_password' => env('DEMO_GROUP_ADMIN_PASSWORD', 'group-admin-demo'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

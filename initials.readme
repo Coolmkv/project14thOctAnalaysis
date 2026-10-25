@@ -8,6 +8,14 @@ The admin signs in at `/admin/login`, creates institutes and staff accounts,
 and assigns group admins to one or more institutes. Group admins sign in at
 `/group-admin/login`.
 
+For local/testing demo data, run `php artisan db:seed`. This creates:
+- Admin: `admin@example.com` / `DEMO_ADMIN_PASSWORD`
+- Group admin: `group-admin@example.com` / `DEMO_GROUP_ADMIN_PASSWORD`
+
+Set both password variables in `.env` before seeding; the documented values in
+`.env.example` are local demo defaults and must not be used in production.
+The group-admin demo account is assigned to the Demo Institute.
+
 Admins and group admins can import students from a CSV containing exactly
 these headers: `name,email`. Each import can contain up to 500 students.
 The generated temporary password is displayed once after import; share it

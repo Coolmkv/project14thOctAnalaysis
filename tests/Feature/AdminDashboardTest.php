@@ -141,4 +141,61 @@ class AdminDashboardTest extends TestCase
             'role' => User::ROLE_USER,
         ]);
     }
+
+    public function test_admin_staff_and_student_data_tables_return_paginated_rows(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $staff = User::factory()->create([
+            'name' => 'Counselor Table',
+            'role' => User::ROLE_COUNSELOR,
+        ]);
+        $student = User::factory()->create(['name' => 'Student Table']);
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.data.staff', ['draw' => 3, 'start' => 0, 'length' => 10]))
+            ->assertOk()
+            ->assertJsonPath('draw', 3)
+            ->assertJsonPath('recordsTotal', 2)
+            ->assertJsonFragment(['name' => $staff->name]);
+
+        $this->getJson(route('admin.data.students', [
+            'draw' => 4,
+            'start' => 0,
+            'length' => 10,
+            'search' => ['value' => 'Student Table'],
+        ]))
+            ->assertOk()
+            ->assertJsonPath('draw', 4)
+            ->assertJsonPath('recordsTotal', 1)
+            ->assertJsonPath('recordsFiltered', 1)
+            ->assertJsonPath('data.0.name', $student->name);
+    }
+
+    public function test_deleting_an_institute_keeps_student_accounts_and_assessment_submissions(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $institute = Institute::create(['name' => 'Closing School']);
+        $student = User::factory()->create();
+        $student->institutes()->attach($institute);
+        $assessment = User::factory()->create(['role' => User::ROLE_COUNSELOR])
+            ->assessments()->create(['title' => 'Career reflection', 'status' => 'published']);
+        $submission = $assessment->submissions()->create([
+            'user_id' => $student->id,
+            'answers' => ['question' => 'choice'],
+            'submitted_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.institutes.destroy', $institute))
+            ->assertRedirect(route('admin.dashboard'))
+            ->assertSessionHas('status');
+
+        $this->assertDatabaseMissing('institutes', ['id' => $institute->id]);
+        $this->assertDatabaseHas('users', ['id' => $student->id]);
+        $this->assertDatabaseHas('assessment_submissions', ['id' => $submission->id]);
+        $this->assertDatabaseMissing('institute_user', [
+            'institute_id' => $institute->id,
+            'user_id' => $student->id,
+        ]);
+    }
 }

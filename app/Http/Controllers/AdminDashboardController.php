@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assessment;
 use App\Models\Institute;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,18 +21,13 @@ class AdminDashboardController extends Controller
     public function adminDashboard(): View
     {
         return view('admin.dashboard', [
-            'staff' => User::query()
-                ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COUNSELOR, User::ROLE_GROUP_ADMIN])
-                ->with('institutes')
-                ->latest()
-                ->get(),
             'institutes' => Institute::query()->withCount('users')->orderBy('name')->get(),
-            'students' => User::query()
-                ->where('role', User::ROLE_USER)
-                ->with('institutes')
-                ->withCount('assessmentSubmissions')
-                ->latest()
-                ->paginate(25, ['*'], 'students_page'),
+            'staffCount' => User::query()->whereIn('role', [
+                User::ROLE_ADMIN,
+                User::ROLE_COUNSELOR,
+                User::ROLE_GROUP_ADMIN,
+            ])->count(),
+            'studentCount' => User::query()->where('role', User::ROLE_USER)->count(),
             'assessments' => Assessment::query()
                 ->with('author')
                 ->withCount('submissions')
@@ -39,6 +35,16 @@ class AdminDashboardController extends Controller
                 ->limit(25)
                 ->get(),
         ]);
+    }
+
+    public function staffData(Request $request): JsonResponse
+    {
+        return $this->userDataTable($request, true);
+    }
+
+    public function studentData(Request $request): JsonResponse
+    {
+        return $this->userDataTable($request, false);
     }
 
     public function groupAdminDashboard(Request $request): View
@@ -112,6 +118,15 @@ class AdminDashboardController extends Controller
         Institute::create(['name' => $validated['institute_name']]);
 
         return redirect()->route('admin.dashboard')->with('status', 'Institute created successfully.');
+    }
+
+    public function deleteInstitute(Institute $institute): RedirectResponse
+    {
+        $name = $institute->name;
+        $institute->delete();
+
+        return redirect()->route('admin.dashboard')
+            ->with('status', $name.' was deleted. Student accounts and assessment results were kept.');
     }
 
     public function importStudents(Request $request): RedirectResponse
@@ -258,5 +273,65 @@ class AdminDashboardController extends Controller
         });
 
         return $temporaryPassword;
+    }
+
+    private function userDataTable(Request $request, bool $staff): JsonResponse
+    {
+        $roles = $staff
+            ? [User::ROLE_ADMIN, User::ROLE_COUNSELOR, User::ROLE_GROUP_ADMIN]
+            : [User::ROLE_USER];
+        $query = User::query()->whereIn('role', $roles);
+        $recordsTotal = (clone $query)->count();
+        $search = trim((string) $request->input('search.value', ''));
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%')
+                    ->orWhere('role', 'like', '%'.str_replace(' ', '_', $search).'%');
+            });
+        }
+
+        $recordsFiltered = (clone $query)->count();
+        $columns = $staff
+            ? ['name', 'email', 'role', 'id']
+            : ['name', 'email', 'id', 'assessment_submissions_count'];
+        $orderIndex = filter_var($request->input('order.0.column', 0), FILTER_VALIDATE_INT);
+        $orderIndex = $orderIndex !== false && isset($columns[$orderIndex]) ? $orderIndex : 0;
+        $direction = $request->input('order.0.dir') === 'desc' ? 'desc' : 'asc';
+        $length = filter_var($request->input('length', 10), FILTER_VALIDATE_INT);
+        $length = $length !== false ? min(max($length, 1), 100) : 10;
+        $start = filter_var($request->input('start', 0), FILTER_VALIDATE_INT);
+        $start = $start !== false ? max($start, 0) : 0;
+
+        $query->orderBy($columns[$orderIndex], $direction);
+        if ($staff) {
+            $query->with('institutes');
+        } else {
+            $query->with('institutes')->withCount('assessmentSubmissions');
+        }
+
+        $data = $query->skip($start)->take($length)->get()->map(function (User $user) use ($staff): array {
+            $row = [
+                'name' => $user->name,
+                'email' => $user->email,
+                'institutes' => $user->institutes->pluck('name')->join(', ') ?: '—',
+            ];
+
+            if ($staff) {
+                $row['role'] = str($user->role)->replace('_', ' ')->title()->toString();
+            } else {
+                $row['completed_assessments'] = $user->assessment_submissions_count;
+            }
+
+            return $row;
+        });
+
+        return response()->json([
+            'draw' => max(0, (int) $request->input('draw', 0)),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 }

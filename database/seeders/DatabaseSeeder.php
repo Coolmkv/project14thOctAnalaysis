@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Institute;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -39,6 +40,28 @@ class DatabaseSeeder extends Seeder
                 'role' => User::ROLE_USER,
             ],
         );
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Site Administrator',
+                'password' => Hash::make(config('app.demo_admin_password')),
+                'role' => User::ROLE_ADMIN,
+            ],
+        );
+        $admin->forceFill(['role' => User::ROLE_ADMIN])->save();
+
+        $institute = Institute::firstOrCreate(['name' => 'Demo Institute']);
+        $groupAdmin = User::firstOrCreate(
+            ['email' => 'group-admin@example.com'],
+            [
+                'name' => 'Demo Group Admin',
+                'password' => Hash::make(config('app.demo_group_admin_password')),
+                'role' => User::ROLE_GROUP_ADMIN,
+            ],
+        );
+        $groupAdmin->forceFill(['role' => User::ROLE_GROUP_ADMIN])->save();
+        $groupAdmin->institutes()->syncWithoutDetaching([$institute->id]);
 
         $samples = [
             [

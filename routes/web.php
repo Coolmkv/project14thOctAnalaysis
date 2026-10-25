@@ -47,8 +47,12 @@ Route::middleware(['auth', EnsurePasswordIsChanged::class])->group(function () {
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/', [AdminDashboardController::class, 'adminDashboard'])->name('dashboard');
+        Route::get('/data/staff', [AdminDashboardController::class, 'staffData'])->name('data.staff');
+        Route::get('/data/students', [AdminDashboardController::class, 'studentData'])->name('data.students');
         Route::post('/users', [AdminDashboardController::class, 'createUser'])->name('users.store');
         Route::post('/institutes', [AdminDashboardController::class, 'createInstitute'])->name('institutes.store');
+        Route::delete('/institutes/{institute}', [AdminDashboardController::class, 'deleteInstitute'])
+            ->name('institutes.destroy');
         Route::post('/students/import', [AdminDashboardController::class, 'importStudents'])
             ->middleware('throttle:5,1')->name('students.import');
     });
