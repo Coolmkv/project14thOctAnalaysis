@@ -81,7 +81,7 @@ class RiaSecScorer
     public static function chartPoints(array $scores, float $center = 150.0, float $radius = 90.0): array
     {
         $values = array_values($scores);
-        $maxScore = max($values, 1);
+        $maxScore = max(1, ...$values);
 
         $points = [];
         foreach (self::ORDER as $index => $code) {

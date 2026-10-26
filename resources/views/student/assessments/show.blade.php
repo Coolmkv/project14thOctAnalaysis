@@ -3,7 +3,7 @@
 @section('title', $assessment->title)
 
 @section('content')
-<div class="mx-auto max-w-3xl">
+<div class="mx-auto">
     <a href="{{ route('student.assessments.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">← All assessments</a>
     <div class="mt-5 rounded-2xl border border-slate-200 bg-white p-6 sm:p-9">
         <p class="text-sm font-bold uppercase tracking-[0.16em] text-indigo-600">Career reflection</p>
@@ -17,11 +17,15 @@
             <div class="mt-7 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" role="status">Completed {{ $submission->submitted_at->format('M j, Y') }}. Your answers are saved below.</div>
 
             @if (!empty($riaSecProfile))
-                @php($topDomains = \App\Support\RiaSecScorer::topDomains($riaSecProfile))
+                @php
+                    $topDomains = \App\Support\RiaSecScorer::topDomains($riaSecProfile);
+                @endphp
                 <div class="mt-7 rounded-2xl border border-indigo-200 bg-indigo-50/80 p-5">
                     <p class="text-sm font-bold uppercase tracking-[0.16em] text-indigo-700">RIASEC profile</p>
                     <h2 class="mt-3 font-display text-2xl font-bold text-slate-900">Your strongest interest patterns</h2>
-                    @php($chartPoints = \App\Support\RiaSecScorer::chartPoints($riaSecProfile))
+                    @php
+                        $chartPoints = \App\Support\RiaSecScorer::chartPoints($riaSecProfile);
+                    @endphp
                     <div class="mt-5 grid gap-5 xl:grid-cols-[280px_1fr]">
                         <div class="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
                             <svg viewBox="0 0 300 300" class="mx-auto block h-64 w-full max-w-[280px]">
@@ -64,7 +68,9 @@
                         </div>
                         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                             @foreach ($topDomains as $domain)
-                                @php($details = \App\Support\RiaSecScorer::DOMAIN_DETAILS[$domain['code']])
+                                @php
+                                    $details = \App\Support\RiaSecScorer::DOMAIN_DETAILS[$domain['code']];
+                                @endphp
                                 <div class="rounded-xl border border-indigo-100 bg-white p-4 shadow-sm">
                                     <div class="flex items-center justify-between gap-3">
                                         <span class="text-sm font-bold text-indigo-700">{{ $domain['code'] }}</span>
