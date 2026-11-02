@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AssessmentQuestion extends Model
 {
-    protected $fillable = ['prompt', 'choices', 'position'];
+    protected $fillable = ['prompt', 'choices', 'position', 'riasec_domain'];
 
     protected function casts(): array
     {

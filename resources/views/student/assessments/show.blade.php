@@ -93,7 +93,12 @@
                 @foreach ($assessment->questions as $question)
                     <section>
                         <h2 class="font-bold leading-6 text-slate-900">{{ $loop->iteration }}. {{ $question->prompt }}</h2>
-                        <p class="mt-2 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{{ $submission->answers[$question->id] ?? 'No answer saved' }}</p>
+                        @if ($question->riasec_domain)
+                            <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-indigo-600">{{ \App\Support\RiaSecScorer::DOMAIN_DETAILS[$question->riasec_domain]['label'] }} interest</p>
+                            <p class="mt-2 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{{ \App\Support\RiaSecScorer::ratingLabel((string) ($submission->answers[$question->id] ?? '')) ?? 'No answer saved' }}</p>
+                        @else
+                            <p class="mt-2 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{{ $submission->answers[$question->id] ?? 'No answer saved' }}</p>
+                        @endif
                     </section>
                 @endforeach
             </div>
@@ -107,14 +112,26 @@
                     @foreach ($assessment->questions as $question)
                         <fieldset>
                             <legend class="font-bold leading-6 text-slate-900">{{ $loop->iteration }}. {{ $question->prompt }} <span class="text-rose-500">*</span></legend>
-                            <div class="mt-3 space-y-2">
-                                @foreach ($question->choices as $choice)
-                                    <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 px-4 py-3 transition hover:border-indigo-300 hover:bg-indigo-50/50 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
-                                        <input type="radio" name="answers[{{ $question->id }}]" value="{{ $choice }}" required @checked(old('answers.'.$question->id) === $choice) class="mt-1 border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                                        <span class="text-sm leading-6 text-slate-700">{{ $choice }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
+                            @if ($question->riasec_domain)
+                                <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-indigo-600">{{ \App\Support\RiaSecScorer::DOMAIN_DETAILS[$question->riasec_domain]['label'] }} interest</p>
+                                <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                                    @foreach (\App\Support\RiaSecScorer::RATING_OPTIONS as $rating => $label)
+                                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 px-4 py-3 transition hover:border-indigo-300 hover:bg-indigo-50/50 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
+                                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $rating }}" required @checked((string) old('answers.'.$question->id) === (string) $rating) class="mt-1 border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                            <span class="text-sm leading-6 text-slate-700">{{ $label }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="mt-3 space-y-2">
+                                    @foreach ($question->choices as $choice)
+                                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 px-4 py-3 transition hover:border-indigo-300 hover:bg-indigo-50/50 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
+                                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $choice }}" required @checked(old('answers.'.$question->id) === $choice) class="mt-1 border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                            <span class="text-sm leading-6 text-slate-700">{{ $choice }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
                         </fieldset>
                     @endforeach
                 </div>

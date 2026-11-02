@@ -15,16 +15,17 @@
     @if ($studentSummaries->isEmpty())
         <div class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
             <h2 class="font-display text-2xl font-bold text-slate-900">No submissions yet</h2>
-            <p class="mt-2 text-slate-500">When students complete this assessment, their RIASEC profiles will appear here.</p>
+            <p class="mt-2 text-slate-500">{{ $isRiaSecAssessment ? 'When students complete this assessment, their RIASEC profiles will appear here.' : 'Completed student responses will appear here.' }}</p>
         </div>
     @else
         <div class="mt-8 space-y-6">
             @foreach ($studentSummaries as $summary)
-                @php
-                    $profile = $summary['scores'];
-                    $chartPoints = \App\Support\RiaSecScorer::chartPoints($profile);
-                    $top = $summary['top'];
-                @endphp
+                @if ($isRiaSecAssessment)
+                    @php
+                        $profile = $summary['scores'];
+                        $chartPoints = \App\Support\RiaSecScorer::chartPoints($profile);
+                        $top = $summary['top'];
+                    @endphp
                 <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div>
@@ -90,7 +91,7 @@
                                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                                     <div class="flex items-center justify-between gap-3">
                                         <span class="text-sm font-bold text-indigo-700">{{ $code }}</span>
-                                        <span class="text-sm font-semibold text-slate-500">{{ $profile[$code] }}/{{ count($assessment->questions) }}</span>
+                                        <span class="text-sm font-semibold text-slate-500">{{ $isRatingScaleAssessment ? number_format($profile[$code], 1).'/5' : $profile[$code].'/'.count($assessment->questions) }}</span>
                                     </div>
                                     <p class="mt-3 font-bold text-slate-900">{{ $details['label'] }}</p>
                                     <p class="mt-1 text-sm leading-6 text-slate-600">{{ $details['description'] }}</p>
@@ -99,6 +100,22 @@
                         </div>
                     </div>
                 </article>
+                @else
+                    <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                        <div>
+                            <h2 class="font-display text-2xl font-bold text-slate-900">{{ $summary['student']->name }}</h2>
+                            <p class="mt-1 text-sm text-slate-500">Submitted {{ $summary['submitted_at']->format('M j, Y') }}</p>
+                        </div>
+                        <div class="mt-6 space-y-5">
+                            @foreach ($assessment->questions as $question)
+                                <section>
+                                    <h3 class="font-bold leading-6 text-slate-900">{{ $loop->iteration }}. {{ $question->prompt }}</h3>
+                                    <p class="mt-2 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{{ $question->riasec_domain ? \App\Support\RiaSecScorer::ratingLabel((string) ($summary['answers'][$question->id] ?? '')) ?? 'No answer saved' : ($summary['answers'][$question->id] ?? 'No answer saved') }}</p>
+                                </section>
+                            @endforeach
+                        </div>
+                    </article>
+                @endif
             @endforeach
         </div>
     @endif

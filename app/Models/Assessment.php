@@ -11,7 +11,7 @@ class Assessment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'status'];
+    protected $fillable = ['title', 'description', 'assessment_type', 'status'];
 
     public function author(): BelongsTo
     {

@@ -79,6 +79,8 @@ Route::middleware(['auth', EnsurePasswordIsChanged::class])->group(function () {
         Route::get('/assessments', [AssessmentController::class, 'index'])->name('index');
         Route::get('/assessments/create', [AssessmentController::class, 'create'])->name('create');
         Route::post('/assessments', [AssessmentController::class, 'store'])->name('store');
+        Route::get('/assessments/{assessment}/edit', [AssessmentController::class, 'edit'])->name('edit');
+        Route::put('/assessments/{assessment}', [AssessmentController::class, 'update'])->name('update');
         Route::get('/assessments/{assessment}/results', [AssessmentController::class, 'results'])->name('results');
     });
 });

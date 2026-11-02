@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Assessment;
+use App\Support\RiaSecScorer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -62,6 +63,7 @@ class StudentAssessmentTest extends TestCase
         $assessment = $counselor->assessments()->create([
             'title' => 'RIASEC Career Interest Inventory',
             'description' => 'A structured RIASEC assessment to help students identify their strongest patterns.',
+            'assessment_type' => 'riasec',
             'status' => 'published',
         ]);
 
@@ -107,6 +109,47 @@ class StudentAssessmentTest extends TestCase
             ->assertSee('RIASEC profile')
             ->assertSee('Realistic')
             ->assertSee('Social');
+    }
+
+    public function test_student_rates_each_riasec_activity_on_the_five_point_scale(): void
+    {
+        $student = User::factory()->create();
+        $counselor = User::factory()->create(['role' => User::ROLE_COUNSELOR]);
+        $assessment = $counselor->assessments()->create([
+            'title' => 'Exploratory interest reflection',
+            'assessment_type' => 'riasec',
+            'status' => 'published',
+        ]);
+        $questions = collect(RiaSecScorer::starterQuestions())
+            ->groupBy('riasec_domain')
+            ->flatMap(fn ($items) => $items->take(3))
+            ->values()
+            ->map(fn ($item, $position) => $assessment->questions()->create([
+                'prompt' => $item['prompt'],
+                'choices' => array_keys(RiaSecScorer::RATING_OPTIONS),
+                'position' => $position + 1,
+                'riasec_domain' => $item['riasec_domain'],
+            ]));
+
+        $answers = $questions->mapWithKeys(fn ($question) => [
+            $question->id => $question->riasec_domain === 'R' ? '5' : '2',
+        ])->all();
+
+        $this->actingAs($student)
+            ->get(route('student.assessments.show', $assessment))
+            ->assertOk()
+            ->assertSee('Extremely interested')
+            ->assertSee('Not interested');
+
+        $this->actingAs($student)
+            ->post(route('student.assessments.submit', $assessment), ['answers' => $answers])
+            ->assertRedirect(route('student.assessments.show', $assessment));
+
+        $this->actingAs($student)
+            ->get(route('student.assessments.show', $assessment))
+            ->assertOk()
+            ->assertSee('RIASEC profile')
+            ->assertSee('Extremely interested');
     }
 
     public function test_student_cannot_submit_an_answer_not_offered_by_the_assessment(): void

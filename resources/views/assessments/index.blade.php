@@ -16,7 +16,10 @@
             <div class="mt-5 border-t border-slate-100 pt-4 text-sm font-semibold text-slate-500">{{ $assessment->questions_count }} {{ \Illuminate\Support\Str::plural('question', $assessment->questions_count) }}</div>
             <div class="mt-5 flex items-center justify-between gap-3">
                 <span class="text-sm text-slate-500">{{ $assessment->submissions_count }} completed</span>
-                <a href="{{ route('assessments.results', $assessment) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">View results</a>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('assessments.edit', $assessment) }}" class="text-sm font-bold text-slate-600 hover:text-slate-800">Edit</a>
+                    <a href="{{ route('assessments.results', $assessment) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">View results</a>
+                </div>
             </div>
         </article>
     @empty

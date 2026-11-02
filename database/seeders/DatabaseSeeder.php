@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Institute;
 use App\Models\User;
+use App\Support\RiaSecScorer;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -75,17 +76,18 @@ class DatabaseSeeder extends Seeder
                 ],
             ],
             [
-                'title' => 'RIASEC Career Interest Inventory',
-                'description' => 'A structured RIASEC assessment to help students identify the kinds of work environments and tasks that may fit them best.',
+                'title' => 'RIASEC Activity Interest Reflection',
+                'description' => 'An exploratory reflection on how much students would enjoy a range of activities across six broad interest areas. This is not a validated career test.',
+                'assessment_type' => 'riasec',
                 'status' => 'published',
-                'questions' => [
-                    ['Which kind of task sounds most engaging?', ['Realistic: Building, fixing, or working with tools', 'Investigative: Researching, testing, or solving complex problems', 'Artistic: Designing, creating, or expressing ideas in a visual or creative way', 'Social: Helping, teaching, or supporting other people', 'Enterprising: Leading projects, influencing others, or taking initiative', 'Conventional: Organizing, planning, or keeping a system running smoothly']],
-                    ['What kind of work environment do you prefer?', ['Realistic: Hands-on work with materials, equipment, or physical tasks', 'Investigative: Structured problem-solving and experimentation', 'Artistic: Flexible, creative spaces with room for originality', 'Social: Collaborative environments where people are supported', 'Enterprising: Fast-moving settings with goals, leadership, and decision-making', 'Conventional: Clear routines, procedures, and organized systems']],
-                    ['Which style of learning feels most natural?', ['Realistic: Learning by doing or practicing a skill directly', 'Investigative: Learning by asking questions and exploring ideas', 'Artistic: Learning by experimenting and creating', 'Social: Learning through conversation, feedback, and teamwork', 'Enterprising: Learning through challenges, momentum, and action', 'Conventional: Learning through clear steps, checklists, and structure']],
-                    ['What kind of project would you most enjoy?', ['Realistic: Making or improving something practical', 'Investigative: Understanding a cause, pattern, or technical problem', 'Artistic: Creating a product, presentation, or experience', 'Social: Supporting a team, community, or person', 'Enterprising: Launching an idea or leading a plan forward', 'Conventional: Managing details, documentation, and quality standards']],
-                    ['Which type of problem do you enjoy solving?', ['Realistic: Mechanical or hands-on challenges', 'Investigative: Scientific, analytical, or research-based questions', 'Artistic: Creative or expressive challenges', 'Social: Personal, communication, or community challenges', 'Enterprising: Strategic or competitive challenges', 'Conventional: Process, data, or organization challenges']],
-                    ['When you imagine your future career, what feels most appealing?', ['Realistic: Building, repairing, operating, or making things happen', 'Investigative: Discovering, understanding, and improving systems', 'Artistic: Designing, creating, and bringing ideas to life', 'Social: Supporting, guiding, and connecting with people', 'Enterprising: Setting direction, leading change, and influencing outcomes', 'Conventional: Organizing work, managing information, and keeping things reliable']],
-                ],
+                'questions' => array_map(
+                    fn (array $question) => [
+                        $question['prompt'],
+                        array_keys(RiaSecScorer::RATING_OPTIONS),
+                        $question['riasec_domain'],
+                    ],
+                    RiaSecScorer::starterQuestions(),
+                ),
             ],
             [
                 'title' => 'Strengths in action',
@@ -113,17 +115,48 @@ class DatabaseSeeder extends Seeder
             $questions = $sample['questions'];
             unset($sample['questions']);
 
-            $assessment = $counselor->assessments()->firstOrCreate(
+            $isRiaSec = ($sample['assessment_type'] ?? 'general') === 'riasec';
+            $assessment = $isRiaSec
+                ? $counselor->assessments()
+                    ->whereIn('title', [$sample['title'], 'RIASEC Career Interest Inventory'])
+                    ->first()
+                : null;
+            $assessment ??= $counselor->assessments()->firstOrCreate(
                 ['title' => $sample['title']],
                 $sample,
             );
+            $hasDomainTaggedQuestions = $assessment->questions()->whereNotNull('riasec_domain')->exists();
 
-            if ($assessment->questions()->doesntExist()) {
-                foreach ($questions as $index => [$prompt, $choices]) {
+            if ($isRiaSec && ! $hasDomainTaggedQuestions && $assessment->submissions()->exists()) {
+                $sample['title'] = 'RIASEC Activity Interest Reflection (New)';
+                $assessment = $counselor->assessments()->firstOrCreate(
+                    ['title' => $sample['title']],
+                    $sample,
+                );
+                $hasDomainTaggedQuestions = $assessment->questions()->whereNotNull('riasec_domain')->exists();
+            }
+
+            if ($isRiaSec && ! $assessment->submissions()->exists()) {
+                $assessment->update([
+                    'title' => $sample['title'],
+                    'description' => $sample['description'],
+                    'assessment_type' => 'riasec',
+                    'status' => $sample['status'],
+                ]);
+            } elseif ($assessment->assessment_type !== 'general') {
+                $assessment->update(['assessment_type' => 'general']);
+            }
+
+            if ($assessment->questions()->doesntExist() || ($isRiaSec && ! $hasDomainTaggedQuestions)) {
+                $assessment->questions()->delete();
+
+                foreach ($questions as $index => $questionData) {
+                    [$prompt, $choices, $domain] = array_pad($questionData, 3, null);
                     $assessment->questions()->create([
                         'prompt' => $prompt,
                         'choices' => $choices,
                         'position' => $index + 1,
+                        'riasec_domain' => $domain,
                     ]);
                 }
             }
